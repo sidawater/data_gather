@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 # by sidawater
+from ._tools import run_create
 
 
 class BaseSingleData(dict):
@@ -10,6 +11,12 @@ class BaseSingleData(dict):
 class BaseDataGather(list):
     """
     used for chain filter
+    main function is filter and chain filter
+    e.g.
+        bdg = BaseDataGather([obj1, obj2..])
+        `x = bdg.filter(column1=value1, column2=value2).filter(column3=value3)`
+        or
+        x = bgd.column1(value1).column2(value2)
     """
 
     __created = False
@@ -36,7 +43,7 @@ class BaseDataGather(list):
     def __call__(self, value):
         return self.filter(**{self.__chain_step: value})
 
-    def __create(self):
+    def _create(self):
         if not self.__created:
             self._source = [i for i in self._source if self.__filter_judge(obj=i, **self.__filter_conditions)]
             self.extend(self._source)
@@ -44,16 +51,21 @@ class BaseDataGather(list):
             self.__created = True
 
     def filter(self, **kwargs):
-        self.__filter_conditions.update(kwargs)
-        return type(self)(self._source, **self.__filter_conditions)
+        kwargs.update(self.__filter_conditions)
+        return type(self)(self._source, **kwargs)
 
     def _judge(self, key, value, obj):
-        return self.judgments(key, value, obj)
+        x = self.judgments(key, value, obj)
+        return x
 
     def judgments(self, key, value, obj):
-        return obj_value == refer_value
+        return getattr(obj, key) == value
 
+    @run_create
     def show(self):
-        self.__create()
-        print(self)
         return self
+
+    @property
+    @run_create
+    def length(self):
+        return len(self)

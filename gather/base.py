@@ -21,7 +21,6 @@ class BaseDataGather(list):
 
     __created = False
 
-
     def __init__(self, src, chain_step=None, **kwargs):
         self._source = src
         self.__filter_conditions = kwargs
@@ -60,6 +59,16 @@ class BaseDataGather(list):
 
     def judgments(self, key, value, obj):
         return getattr(obj, key) == value
+
+    def append(self, value):
+        if self.__created:
+            self.append(value)
+        self._source.append(value)
+
+    def extend(self, value_list):
+        if self.__created:
+            self.extend(value_list)
+        self._source.extend(value)
 
     @run_create
     def show(self):
